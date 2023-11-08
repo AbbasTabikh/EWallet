@@ -8,7 +8,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDataContext(builder.Configuration);
-
+builder.Services.AddJwt(builder.Configuration);
 
 var app = builder.Build();
 

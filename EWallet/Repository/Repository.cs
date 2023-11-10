@@ -1,10 +1,7 @@
 ﻿using EWallet.Data;
 using EWallet.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 using System.Linq.Expressions;
-using System.Text.RegularExpressions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace EWallet.Repository
 {
@@ -20,8 +17,8 @@ namespace EWallet.Repository
 
         public async Task<T> Add(T entity, CancellationToken cancellationToken)
         {
-            await _context.AddAsync(entity, cancellationToken);
-            return entity;
+            var entry = await _context.AddAsync(entity, cancellationToken);
+            return entry.Entity;
         }
 
         public void BulkDelete(IEnumerable<T> entities)
@@ -52,9 +49,9 @@ namespace EWallet.Repository
             return await query.ToListAsync(token);
         }
 
-        public async Task<T?> GetByID(Guid id)
+        public async Task<T?> GetByID(Guid id, CancellationToken cancellationToken)
         {
-            return await _dbSet.SingleOrDefaultAsync(x => x.ID == id);
+            return await _dbSet.SingleOrDefaultAsync(x => x.ID == id, cancellationToken);
         }
 
         public async Task<IEnumerable<T>> GetManyByExpression(Expression<Func<T, bool>> filter, string additionalProperties, CancellationToken cancellationToken)

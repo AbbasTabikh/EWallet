@@ -1,7 +1,15 @@
 ﻿using EWallet.Data;
+using EWallet.InputModels;
+using EWallet.Repository;
+using EWallet.Services;
+using EWallet.Services.Interfaces;
+using EWallet.Validations;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 namespace EWallet.Extenstions
@@ -36,6 +44,58 @@ namespace EWallet.Extenstions
                 };
             });
 
+            return services;
+        }
+
+        internal static IServiceCollection AddValidators(this IServiceCollection services)
+        {
+            services.AddScoped<IValidator<UserInput>, UserValidation>();
+            return services;
+        }
+        internal static IServiceCollection AddSwagger(this IServiceCollection services)
+        {
+            services.AddSwaggerGen(c =>
+            {
+                    c.SwaggerDoc("v1", new OpenApiInfo { Title = "E-Wallet Api", Version = "v1.2" });
+
+                    // Define the BearerAuth scheme that's in use
+                    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                    {
+                        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                        Name = "Authorization",
+                        In = ParameterLocation.Header,
+                        Type = SecuritySchemeType.Http,
+                        Scheme = "bearer", // must be lowercase
+                        BearerFormat = "JWT"
+                    });
+
+                    // Make sure swagger UI asks for the required parameters
+                    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                    {{
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()}});
+            });
+
+            return services;
+        }
+
+        internal static IServiceCollection AddServices(this IServiceCollection services)
+        {
+            services.AddHttpContextAccessor();
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped(typeof(IPasswordHasher<>), typeof(PasswordHasher<>));
+
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IBudgetService, BudgetService>();
+            services.AddScoped<IHttpContextService, HttpContextService>();
             return services;
         }
     }

@@ -1,9 +1,10 @@
 ﻿using EWallet.Entities;
+using EWallet.Models;
 
 namespace EWallet.Services.Interfaces
 {
     public interface ITokenService
     {
-        string GenerateToken(User user);
+        AccessToken GenerateToken(User user);
     }
 }

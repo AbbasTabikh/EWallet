@@ -1,4 +1,7 @@
 ﻿using EWallet.Entities;
+using EWallet.Enums;
+using EWallet.InputModels;
+using EWallet.Mappings;
 using EWallet.Repository;
 using EWallet.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
@@ -18,17 +21,32 @@ namespace EWallet.Services
             _passwordHasher = passwordHasher;
         }
 
-        public async Task<User?> SignIn(User userInput, CancellationToken cancellationToken)
+        public async Task<User?> GetByUsername(string username, CancellationToken cancellationToken)
         {
-            return null;
+            return await _userRepository.GetSingleByExpression(x => x.Username == username, string.Empty, cancellationToken);
         }
 
-        public async Task<User?> SignUp(User newUser, CancellationToken cancellationToken)
+        public async Task Save(CancellationToken cancellationToken)
         {
-            //1. validations later..
+            await _userRepository.Save(cancellationToken);
+        }
 
-            newUser.Password = _passwordHasher.HashPassword(newUser, newUser.Password);
-            return await _userRepository.Add(newUser, cancellationToken);
+        public async Task<(User? user, LoginStatus status)> SignIn(UserInput userInput, CancellationToken cancellationToken)
+        {
+            var user = await _userRepository.GetSingleByExpression(x => x.Username == userInput.Username, string.Empty, cancellationToken);
+            if(user is null)
+            {
+                return (null, LoginStatus.UserNotFound);
+            }
+            var result = _passwordHasher.VerifyHashedPassword(user, user.Password, userInput.Password);
+            return result == PasswordVerificationResult.Success ? (user, LoginStatus.Success) : (null, LoginStatus.PasswordIncorrect);
+        }
+
+        public async Task<User?> SignUp(UserInput userInput, CancellationToken cancellationToken)
+        {
+            var user = userInput.ToUser();
+            user.Password = _passwordHasher.HashPassword(user, user.Password);
+            return await _userRepository.Add(user, cancellationToken);
         }
     }
 }

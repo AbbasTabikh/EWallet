@@ -2,14 +2,13 @@
 using EWallet.Entities;
 using EWallet.InputModels;
 using EWallet.Mappings;
+using EWallet.Models;
 using EWallet.Repository;
 using EWallet.Services.Interfaces;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 
 namespace EWallet.Services
 {
-    public class BudgetService : IBudgetService
+    public class BudgetService : BaseService, IBudgetService
     {
         private readonly IRepository<Budget> _budgetRepository;
         private readonly IHttpContextService _contextService;
@@ -48,6 +47,17 @@ namespace EWallet.Services
             await _budgetRepository.Save(cancellationToken);
         }
 
-       
+        public void Update(UpdateBudgetInputModel updateBudgetInputModel, Budget budget, CancellationToken cancellationToken)
+        {
+            budget.Total = updateBudgetInputModel.Total;
+        }
+
+        public async Task<PagedResponse<BudgetDto>> Get(PageQueryParameters queryParameters, CancellationToken cancellationToken)
+        {
+            var userID = _contextService.GetCurrentUserID();
+
+
+            return null;
+        }
     }
 }

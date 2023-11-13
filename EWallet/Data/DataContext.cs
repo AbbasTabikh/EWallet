@@ -22,25 +22,24 @@ namespace EWallet.Data
             modelBuilder.Entity<User>().Property(x => x.Username).IsRequired();
 
             //budget entity
-            modelBuilder.Entity<Budget>().Property(x => x.Total).HasPrecision(10, 2); //99,999,999.99 $
+            modelBuilder.Entity<Budget>().Property(x => x.Total).HasPrecision(11, 2); //99,999,999.99 $
 
             //expense entity
-            modelBuilder.Entity<Expense>().Property(x => x.Price).HasPrecision(10, 2);
+            modelBuilder.Entity<Expense>().Property(x => x.Price).HasPrecision(11, 2);
             modelBuilder.Entity<Expense>().Property(x => x.Name).IsRequired();
-
-
-
 
             modelBuilder.Entity<User>()
                         .HasMany(x => x.Budgets)
                         .WithOne(x => x.User)
                         .HasForeignKey(x => x.UserID)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
             modelBuilder.Entity<Budget>()
                         .HasMany(x => x.Expenses)
                         .WithOne(x => x.Budget)
                         .HasForeignKey(x => x.BudgetID)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
             

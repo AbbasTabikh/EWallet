@@ -1,6 +1,8 @@
 ﻿using EWallet.Dtos;
 using EWallet.Entities;
 using EWallet.InputModels;
+using EWallet.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace EWallet.Services.Interfaces
 {
@@ -8,7 +10,9 @@ namespace EWallet.Services.Interfaces
     {
         Task<BudgetDto?> GetDtoByID(Guid id, CancellationToken cancellation);
         Task<Budget?> GetByID(Guid id, CancellationToken cancellationToken);
+        Task<PagedResponse<BudgetDto>> Get([FromQuery] PageQueryParameters queryParameters, CancellationToken cancellationToken);
         Task<BudgetDto> Create(CreateBudgetInputModel budgetInput, CancellationToken cancellation);
+        void Update(UpdateBudgetInputModel updateBudgetInputModel, Budget budget, CancellationToken cancellationToken);
         void Delete(Budget budget);
         Task Save(CancellationToken cancellationToken);
     }

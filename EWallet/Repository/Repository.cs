@@ -53,10 +53,10 @@ namespace EWallet.Repository
         {
             return await _dbSet.SingleOrDefaultAsync(x => x.ID == id, cancellationToken);
         }
-
+    
         public async Task<IEnumerable<T>> GetManyByExpression(Expression<Func<T, bool>> filter, string additionalProperties, CancellationToken cancellationToken)
         {
-            var query = _dbSet.Where(filter);
+            IQueryable<T> query = _dbSet.Where(filter);
             
             if (string.IsNullOrEmpty(additionalProperties))
             {

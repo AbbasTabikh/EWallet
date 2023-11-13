@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EWallet.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231107125753_Create_Initial_Database")]
-    partial class Create_Initial_Database
+    [Migration("20231112134221_UpdateBudgetMax")]
+    partial class UpdateBudgetMax
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,8 +35,8 @@ namespace EWallet.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("Total")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("decimal(10,2)");
+                        .HasPrecision(11, 2)
+                        .HasColumnType("decimal(11,2)");
 
                     b.Property<Guid>("UserID")
                         .HasColumnType("uniqueidentifier");
@@ -68,8 +68,8 @@ namespace EWallet.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("decimal(10,2)");
+                        .HasPrecision(11, 2)
+                        .HasColumnType("decimal(11,2)");
 
                     b.HasKey("ID");
 

@@ -20,7 +20,6 @@ namespace EWallet.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         public async Task<ActionResult<BudgetDto>> Create([FromBody] CreateBudgetInputModel createBudgetInputModel, CancellationToken cancellationToken)
         {
             var budgetDto = await _budgetService.Create(createBudgetInputModel, cancellationToken);
@@ -28,10 +27,11 @@ namespace EWallet.Controllers
             return Ok(budgetDto);
         }
 
-        [HttpGet]
+        [HttpGet("{id}")]
         public async Task<ActionResult<BudgetDto>> Get([FromRoute] Guid id, CancellationToken cancellationToken)
         {
             var budgetDto = await _budgetService.GetDtoByID(id, cancellationToken);
+
             if(budgetDto == null)
             {
                 return NotFound(new ErrorResponse
@@ -42,7 +42,31 @@ namespace EWallet.Controllers
             return Ok(budgetDto);
         }
 
-        [HttpDelete]
+        [HttpGet]
+        public async Task<ActionResult<PagedResponse<BudgetDto>>> Get([FromQuery] PageQueryParameters pageQueryParameters, CancellationToken cancellationToken)
+        {
+            var resultPage = await _budgetService.Get(pageQueryParameters, cancellationToken);
+            return Ok(resultPage);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update([FromRoute] Guid id,[FromBody] UpdateBudgetInputModel updateBudgetInputModel, CancellationToken cancellationToken)
+        {
+            var budget = await _budgetService.GetByID(id, cancellationToken);
+
+            if (budget == null)
+            {
+                return NotFound(new ErrorResponse
+                {
+                    ErrorMessage = $"Budget with id {id} doesn't exist in the database"
+                });
+            }
+            _budgetService.Update(updateBudgetInputModel, budget, cancellationToken);
+            await _budgetService.Save(cancellationToken);
+            return Ok();
+        }
+
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
         {
             var budget = await _budgetService.GetByID(id, cancellationToken);
@@ -53,10 +77,13 @@ namespace EWallet.Controllers
                     ErrorMessage = $"Budget with id {id} doesn't exist in the database"
                 });
             }
-
             _budgetService.Delete(budget);
             await _budgetService.Save(cancellationToken);
             return NoContent();
         }
+
+
+
+
     }
 }

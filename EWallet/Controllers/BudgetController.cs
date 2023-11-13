@@ -1,4 +1,5 @@
 ﻿using EWallet.Dtos;
+using EWallet.Entities;
 using EWallet.InputModels;
 using EWallet.Models;
 using EWallet.Services.Interfaces;
@@ -82,7 +83,23 @@ namespace EWallet.Controllers
             return NoContent();
         }
 
+        [HttpDelete]
+        public async Task<IActionResult> BulkDelete([FromBody] IEnumerable<Guid> budgetsIDs, CancellationToken cancellationToken)
+        {
+            var allExists = await _budgetService.AllExists(budgetsIDs, cancellationToken);
+            
+            if (allExists)
+            {
+                _budgetService.BulkDelete(budgetsIDs);
+                await _budgetService.Save(cancellationToken);
+                return NoContent();
+            }
 
+            return BadRequest(new ErrorResponse
+            {
+                ErrorMessage = "Error in sending data, please try again"
+            });
+        }
 
 
     }

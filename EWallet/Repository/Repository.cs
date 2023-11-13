@@ -53,7 +53,25 @@ namespace EWallet.Repository
         {
             return await _dbSet.SingleOrDefaultAsync(x => x.ID == id, cancellationToken);
         }
-    
+
+        public IQueryable<T> GetAsQueryable(Expression<Func<T, bool>> filter, string additionalProperties)
+        {
+            IQueryable<T> query = _dbSet.Where(filter);
+
+            if (string.IsNullOrEmpty(additionalProperties))
+            {
+                return query;
+            }
+
+            var properties = additionalProperties.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim());
+
+            foreach (var property in properties)
+            {
+                query = query.Include(property);
+            }
+            return query;
+        }
+
         public async Task<IEnumerable<T>> GetManyByExpression(Expression<Func<T, bool>> filter, string additionalProperties, CancellationToken cancellationToken)
         {
             IQueryable<T> query = _dbSet.Where(filter);
@@ -88,7 +106,7 @@ namespace EWallet.Repository
                 query = query.Include(property);
             }
 
-            return await query.SingleOrDefaultAsync(cancellationToken);
+            return await query.FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task Save(CancellationToken cancellationToken)
@@ -100,6 +118,11 @@ namespace EWallet.Repository
         {
             _context.Entry(oldentity).CurrentValues.SetValues(newEntity);
             return oldentity;
+        }
+
+        public async Task<int> GetCount(Expression<Func<T, bool>> filter, CancellationToken cancellationToken)
+        {
+            return await _dbSet.CountAsync(filter, cancellationToken);
         }
     }
 }

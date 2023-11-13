@@ -6,7 +6,7 @@ namespace EWallet.Services
 {
     public abstract class BaseService
     {
-        protected async Task<PagedResponse<T>> GetPagedData<T>(IQueryable<T> query, int pageNumber, int pageSize, CancellationToken cancellationToken) where T : BaseEntity
+        protected async Task<PagedResponse<T>> GeneratedPaginatedResponse<T>(IQueryable<T> query, int pageNumber, int pageSize, CancellationToken cancellationToken) where T : BaseEntity
         {
             var pagedResponse = new PagedResponse<T>()
             {

@@ -5,6 +5,7 @@ using EWallet.Mappings;
 using EWallet.Models;
 using EWallet.Repository;
 using EWallet.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace EWallet.Services
 {
@@ -55,9 +56,21 @@ namespace EWallet.Services
         public async Task<PagedResponse<BudgetDto>> Get(PageQueryParameters queryParameters, CancellationToken cancellationToken)
         {
             var userID = _contextService.GetCurrentUserID();
+            var query = _budgetRepository.GetAsQueryable(x => x.UserID == userID, string.Empty);
+            var pagedResponse = await GeneratedPaginatedResponse(query, queryParameters.PageNumber, queryParameters.PageSize, cancellationToken);
+            return pagedResponse.ToDto();
+        }
 
+        public void BulkDelete(IEnumerable<Guid> budgetsIDs)
+        {
+            var budgets = budgetsIDs.Select(x => new Budget { ID = x });
+            _budgetRepository.BulkDelete(budgets);
+        }
 
-            return null;
+        public async Task<bool> AllExists(IEnumerable<Guid> budgetsIDs, CancellationToken cancellationToken)
+        {
+            var count = await _budgetRepository.GetCount(x => budgetsIDs.Contains(x.ID), cancellationToken);
+            return count == budgetsIDs.Count();
         }
     }
 }

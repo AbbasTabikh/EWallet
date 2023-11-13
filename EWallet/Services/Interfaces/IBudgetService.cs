@@ -14,6 +14,8 @@ namespace EWallet.Services.Interfaces
         Task<BudgetDto> Create(CreateBudgetInputModel budgetInput, CancellationToken cancellation);
         void Update(UpdateBudgetInputModel updateBudgetInputModel, Budget budget, CancellationToken cancellationToken);
         void Delete(Budget budget);
+        void BulkDelete(IEnumerable<Guid> budgetsIDs);
         Task Save(CancellationToken cancellationToken);
+        Task<bool> AllExists(IEnumerable<Guid> budgetsIDs, CancellationToken cancellationToken);
     }
 }

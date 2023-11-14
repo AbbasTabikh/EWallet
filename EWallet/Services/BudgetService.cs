@@ -61,16 +61,15 @@ namespace EWallet.Services
             return pagedResponse.ToDto();
         }
 
-        public void BulkDelete(IEnumerable<Guid> budgetsIDs)
+        public void BulkDelete(IEnumerable<Budget> budgets)
         {
-            var budgets = budgetsIDs.Select(x => new Budget { ID = x });
             _budgetRepository.BulkDelete(budgets);
         }
 
-        public async Task<bool> AllExists(IEnumerable<Guid> budgetsIDs, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Budget>> GetExistingIDs(IEnumerable<Guid> budgetsIDs, CancellationToken cancellationToken)
         {
-            var count = await _budgetRepository.GetCount(x => budgetsIDs.Contains(x.ID), cancellationToken);
-            return count == budgetsIDs.Count();
+            var budgets = await _budgetRepository.GetManyByExpression(x => budgetsIDs.Contains(x.ID), string.Empty, cancellationToken);
+            return budgets;
         }
     }
 }

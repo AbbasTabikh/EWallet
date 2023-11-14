@@ -1,6 +1,8 @@
 ﻿using EWallet.Dtos;
 using EWallet.Entities;
 using EWallet.InputModels;
+using EWallet.Validations;
+using EWallet.Validations.ValidationModels;
 
 namespace EWallet.Mappings
 {
@@ -34,6 +36,21 @@ namespace EWallet.Mappings
                 Total = budget.Total,
                 CreationDate = budget.CreationDate!.Value.ToString("dd/MM/yyyy"),
                 Expenses = budget.Expenses
+            };
+        }
+
+        internal static BudgetValidationModel ToValidationModel(this CreateBudgetInputModel createBudgetInputModel)
+        {
+            return new BudgetValidationModel
+            {
+                Total = createBudgetInputModel.Total
+            };
+        }
+        internal static BudgetValidationModel ToValidationModel(this UpdateBudgetInputModel updateBudgetInputModel)
+        {
+            return new BudgetValidationModel
+            {  
+                Total = updateBudgetInputModel.Total
             };
         }
     }

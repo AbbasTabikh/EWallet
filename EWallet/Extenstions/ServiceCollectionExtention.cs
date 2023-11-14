@@ -4,6 +4,7 @@ using EWallet.Repository;
 using EWallet.Services;
 using EWallet.Services.Interfaces;
 using EWallet.Validations;
+using EWallet.Validations.ValidationModels;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -50,6 +51,7 @@ namespace EWallet.Extenstions
         internal static IServiceCollection AddValidators(this IServiceCollection services)
         {
             services.AddScoped<IValidator<UserInput>, UserValidation>();
+            services.AddScoped<IValidator<BudgetValidationModel>, BudgetValidation>();
             return services;
         }
         internal static IServiceCollection AddSwagger(this IServiceCollection services)

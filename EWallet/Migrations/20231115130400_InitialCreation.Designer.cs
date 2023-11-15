@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EWallet.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231114151904_IncreasePrecision")]
-    partial class IncreasePrecision
+    [Migration("20231115130400_InitialCreation")]
+    partial class InitialCreation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

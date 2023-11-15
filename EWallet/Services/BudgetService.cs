@@ -53,7 +53,7 @@ namespace EWallet.Services
             budget.Total = updateBudgetInputModel.Total;
         }
 
-        public async Task<PagedResponse<BudgetDto>> Get(PageQueryParameters queryParameters, CancellationToken cancellationToken)
+        public async Task<PagedResponse<BudgetDto>> Get(PageQueryParametersBase queryParameters, CancellationToken cancellationToken)
         {
             var userID = _contextService.GetCurrentUserID();
             var query = _budgetRepository.GetAsQueryable(x => x.UserID == userID, string.Empty);

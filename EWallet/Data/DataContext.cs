@@ -27,6 +27,7 @@ namespace EWallet.Data
             //expense entity
             modelBuilder.Entity<Expense>().Property(x => x.Price).HasPrecision(12, 2);
             modelBuilder.Entity<Expense>().Property(x => x.Name).IsRequired();
+            modelBuilder.Entity<Expense>().Property(x => x.Category).HasConversion<byte>();
 
             modelBuilder.Entity<User>()
                         .HasMany(x => x.Budgets)

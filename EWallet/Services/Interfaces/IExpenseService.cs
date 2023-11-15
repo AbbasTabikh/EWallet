@@ -6,16 +6,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EWallet.Services.Interfaces
 {
-    public interface IBudgetService
+    public interface IExpenseService
     {
         Task<BudgetDto?> GetDtoByID(Guid id, CancellationToken cancellation);
         Task<Budget?> GetByID(Guid id, CancellationToken cancellationToken);
         Task<PagedResponse<BudgetDto>> Get([FromQuery] PageQueryParametersBase queryParameters, CancellationToken cancellationToken);
-        Task<BudgetDto> Create(CreateBudgetInputModel budgetInput, CancellationToken cancellation);
+        Task<ExpenseDto> Create(CreateExpenseInputModel expenseInputModel, CancellationToken cancellation);
         void Update(UpdateBudgetInputModel updateBudgetInputModel, Budget budget, CancellationToken cancellationToken);
-        void Delete(Budget budget);
-        void BulkDelete(IEnumerable<Budget> budgets);
+        void Delete(Expense expense);
+        void BulkDelete(IEnumerable<Expense> expenses);
         Task Save(CancellationToken cancellationToken);
-        Task<IEnumerable<Budget>> GetExistingIDs(IEnumerable<Guid> budgetsIDs, CancellationToken cancellationToken);
+        Task<IEnumerable<Budget>> GetExistingIDs(IEnumerable<Guid> expensesIDs, CancellationToken cancellationToken);
     }
 }

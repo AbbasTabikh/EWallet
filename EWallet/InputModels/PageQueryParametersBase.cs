@@ -2,7 +2,7 @@
 
 namespace EWallet.InputModels
 {
-    public class PageQueryParameters
+    public class PageQueryParametersBase
     {
         [Required]
         public int PageNumber { get; set; }

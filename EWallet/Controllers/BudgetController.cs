@@ -55,7 +55,7 @@ namespace EWallet.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<PagedResponse<BudgetDto>>> Get([FromQuery] PageQueryParameters pageQueryParameters, CancellationToken cancellationToken)
+        public async Task<ActionResult<PagedResponse<BudgetDto>>> Get([FromQuery] PageQueryParametersBase pageQueryParameters, CancellationToken cancellationToken)
         {
             var resultPage = await _budgetService.Get(pageQueryParameters, cancellationToken);
             return Ok(resultPage);
@@ -111,7 +111,5 @@ namespace EWallet.Controllers
             await _budgetService.Save(cancellationToken);
             return NoContent();
         }
-
-
     }
 }

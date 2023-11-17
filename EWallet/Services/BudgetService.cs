@@ -48,7 +48,7 @@ namespace EWallet.Services
             await _budgetRepository.Save(cancellationToken);
         }
 
-        public void Update(UpdateBudgetInputModel updateBudgetInputModel, Budget budget, CancellationToken cancellationToken)
+        public void Update(UpdateBudgetInputModel updateBudgetInputModel, Budget budget)
         {
             budget.Total = updateBudgetInputModel.Total;
         }
@@ -70,6 +70,11 @@ namespace EWallet.Services
         {
             var budgets = await _budgetRepository.GetManyByExpression(x => budgetsIDs.Contains(x.ID), string.Empty, cancellationToken);
             return budgets;
+        }
+
+        public void UpdateBudgetTotal(Budget budget, decimal originalExpensePrice, decimal newExpensePrice)
+        {
+            budget.Total = (budget.Total + originalExpensePrice) - newExpensePrice;
         }
     }
 }

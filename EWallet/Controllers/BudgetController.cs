@@ -64,7 +64,7 @@ namespace EWallet.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] Guid id,[FromBody] UpdateBudgetInputModel updateBudgetInputModel, CancellationToken cancellationToken)
         {
-            var validator = await _validator.ValidateAsync(updateBudgetInputModel.ToValidationModel());
+            var validator = await _validator.ValidateAsync(updateBudgetInputModel.ToValidationModel(), cancellationToken);
             if (!validator.IsValid)
             {
                 return BadRequest(new ErrorResponse
@@ -82,7 +82,7 @@ namespace EWallet.Controllers
                     ErrorMessage = $"Budget with id {id} doesn't exist in the database"
                 });
             }
-            _budgetService.Update(updateBudgetInputModel, budget, cancellationToken);
+            _budgetService.Update(updateBudgetInputModel, budget);
             await _budgetService.Save(cancellationToken);
             return Ok();
         }

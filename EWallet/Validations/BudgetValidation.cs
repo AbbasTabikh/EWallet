@@ -8,7 +8,7 @@ namespace EWallet.Validations
     {
         public BudgetValidation()
         {
-            RuleFor(x => x.Total).Must(x => x > 0)
+            RuleFor(x => x.Total).Must(x => x >= 0)
                                  .WithMessage("Total must be greater than zero");
 
             RuleFor(x => x.Total).Must(x => x <= Constants.MaxBudget)

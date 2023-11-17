@@ -2,6 +2,9 @@
 using EWallet.Entities;
 using EWallet.Enums;
 using EWallet.InputModels;
+using EWallet.Validations.ValidationModels;
+using Microsoft.EntityFrameworkCore.Query.Internal;
+using Microsoft.Identity.Client;
 
 namespace EWallet.Mappings
 {
@@ -29,7 +32,23 @@ namespace EWallet.Mappings
             };
         }
 
+        public static ExpenseValidationModel ToValidationModel(this CreateExpenseInputModel input)
+        {
+            return new ExpenseValidationModel
+            {
+                Name = input.Name,
+                Price = input.Price
+            };
+        }
 
+        public static ExpenseValidationModel ToValidationModel(this UpdateExpenseInputModel input)
+        {
+            return new ExpenseValidationModel
+            {
+                Name = input.Name,
+                Price = input.NewPrice
+            };
+        }
         private static Category GetCategory(string  categoryName)
         {
             return categoryName switch

@@ -6,6 +6,7 @@ using EWallet.Models;
 using EWallet.Repository;
 using EWallet.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace EWallet.Services
 {
@@ -35,35 +36,38 @@ namespace EWallet.Services
             _expenseRepository.Delete(expense);
         }
 
-        public Task<PagedResponse<ExpenseDto>> Get([FromQuery] ExpenseQueryParameters expenseQueryParameters, CancellationToken cancellationToken)
+        public async Task<Expense?> GetByID(Guid id, CancellationToken cancellationToken)
         {
-            //var query = _expenseRepository.GetAsQueryable(x => x.BudgetID == expenseQueryParameters.BudgetID, string);\
-            return null;
+            return await _expenseRepository.GetByID(id, cancellationToken);
         }
 
-        public Task<Budget?> GetByID(Guid id, CancellationToken cancellationToken)
+        public async Task<Expense?> GetByID(Guid id, string? includedProperties, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await _expenseRepository.GetSingleByExpression(x => x.ID == id, includedProperties, cancellationToken);
         }
 
-        public Task<BudgetDto?> GetDtoByID(Guid id, CancellationToken cancellation)
+        public async Task<IEnumerable<Expense>> GetExistingIDs(IEnumerable<Guid> expensesIDs, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var expenses = await _expenseRepository.GetManyByExpression(x => expensesIDs.Contains(x.ID), string.Empty, cancellationToken);
+            return expenses;
         }
 
-        public Task<IEnumerable<Budget>> GetExistingIDs(IEnumerable<Guid> budgetsIDs, CancellationToken cancellationToken)
+        public async Task Save(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            await _expenseRepository.Save(cancellationToken);
         }
 
-        public Task Save(CancellationToken cancellationToken)
+        public void Update(UpdateExpenseInputModel updateExpenseInputModel, Expense expense, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
-        }
+            if(!string.IsNullOrEmpty(updateExpenseInputModel.Name!.Trim()) )
+            {
+                expense.Name = updateExpenseInputModel.Name;
+            }
 
-        public void Update(UpdateBudgetInputModel updateBudgetInputModel, Budget budget, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
+            if (updateExpenseInputModel?.NewPrice != null)
+            {
+                expense.Price = updateExpenseInputModel.NewPrice.Value;
+            }
         }
     }
 }

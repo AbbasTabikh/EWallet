@@ -91,7 +91,7 @@ namespace EWallet.Repository
             return await query.ToListAsync(cancellationToken);
         }
 
-        public async Task<T?> GetSingleByExpression(Expression<Func<T, bool>> filter, string additionalProperties, CancellationToken cancellationToken)
+        public async Task<T?> GetSingleByExpression(Expression<Func<T, bool>> filter, string? additionalProperties, CancellationToken cancellationToken)
         {
             if(string.IsNullOrEmpty(additionalProperties))
             {
@@ -99,7 +99,7 @@ namespace EWallet.Repository
             }
 
             var properties = additionalProperties.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim());
-            var query = _dbSet.AsQueryable();
+            var query = _dbSet.Where(filter).AsQueryable();
 
             foreach (var property in properties)
             {

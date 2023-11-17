@@ -52,6 +52,7 @@ namespace EWallet.Extenstions
         {
             services.AddScoped<IValidator<UserInput>, UserValidation>();
             services.AddScoped<IValidator<BudgetValidationModel>, BudgetValidation>();
+            services.AddScoped<IValidator<ExpenseValidationModel>, ExpenseValidation>();
             return services;
         }
         internal static IServiceCollection AddSwagger(this IServiceCollection services)
@@ -98,6 +99,7 @@ namespace EWallet.Extenstions
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IBudgetService, BudgetService>();
             services.AddScoped<IHttpContextService, HttpContextService>();
+            services.AddScoped<IExpenseService, ExpenseService>();
             return services;
         }
     }

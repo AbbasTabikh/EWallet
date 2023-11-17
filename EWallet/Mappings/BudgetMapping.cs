@@ -35,7 +35,7 @@ namespace EWallet.Mappings
                 ID = budget.ID,
                 Total = budget.Total,
                 CreationDate = budget.CreationDate!.Value.ToString("dd/MM/yyyy"),
-                Expenses = budget.Expenses
+                Expenses = budget.Expenses.Select(x => x.ToDto())
             };
         }
 

@@ -12,7 +12,8 @@ namespace EWallet.Services.Interfaces
         Task<Budget?> GetByID(Guid id, CancellationToken cancellationToken);
         Task<PagedResponse<BudgetDto>> Get([FromQuery] PageQueryParametersBase queryParameters, CancellationToken cancellationToken);
         Task<BudgetDto> Create(CreateBudgetInputModel budgetInput, CancellationToken cancellation);
-        void Update(UpdateBudgetInputModel updateBudgetInputModel, Budget budget, CancellationToken cancellationToken);
+        void Update(UpdateBudgetInputModel updateBudgetInputModel, Budget budget);
+        void UpdateBudgetTotal(Budget budget, decimal originalExpensePrice, decimal newExpensePrice);
         void Delete(Budget budget);
         void BulkDelete(IEnumerable<Budget> budgets);
         Task Save(CancellationToken cancellationToken);

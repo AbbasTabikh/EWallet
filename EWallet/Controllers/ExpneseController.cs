@@ -6,6 +6,7 @@ using EWallet.Models;
 using EWallet.Services.Interfaces;
 using EWallet.Validations.ValidationModels;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,6 +14,7 @@ namespace EWallet.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ExpneseController : ControllerBase
     {
         private readonly IExpenseService _expenseService;
@@ -29,7 +31,7 @@ namespace EWallet.Controllers
         [HttpPost]
         public async Task<ActionResult<ExpenseDto>> Create([FromBody] CreateExpenseInputModel createExpenseInputModel, CancellationToken cancellationToken)
         {
-            var validator = await _validator.ValidateAsync(createExpenseInputModel.ToValidationModel());
+            var validator = await _validator.ValidateAsync(createExpenseInputModel.ToValidationModel(), cancellationToken);
             
             if(!validator.IsValid)
             {
@@ -59,6 +61,15 @@ namespace EWallet.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateExpenseInputModel updateExpenseInputModel, CancellationToken cancellationToken)
         {
+            var validator = await _validator.ValidateAsync(updateExpenseInputModel.ToValidationModel(), cancellationToken);
+
+            if (!validator.IsValid)
+            {
+                return BadRequest(new ErrorResponse
+                {
+                    FieldErrors = validator.Errors.ToDictionary(x => x.PropertyName, x => x.ErrorMessage)
+                });
+            }
             var expense = await _expenseService.GetByID(id,"Budget", cancellationToken);
 
             if(expense == null)

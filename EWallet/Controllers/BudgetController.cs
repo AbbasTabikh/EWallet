@@ -5,12 +5,14 @@ using EWallet.Models;
 using EWallet.Services.Interfaces;
 using EWallet.Validations.ValidationModels;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EWallet.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class BudgetController : ControllerBase
     {
         private readonly IBudgetService _budgetService;

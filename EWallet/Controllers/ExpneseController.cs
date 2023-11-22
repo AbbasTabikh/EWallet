@@ -31,15 +31,7 @@ namespace EWallet.Controllers
         [HttpPost]
         public async Task<ActionResult<ExpenseDto>> Create([FromBody] CreateExpenseInputModel createExpenseInputModel, CancellationToken cancellationToken)
         {
-            var validator = await _validator.ValidateAsync(createExpenseInputModel.ToValidationModel(), cancellationToken);
-            
-            if(!validator.IsValid)
-            {
-                return BadRequest(new ErrorResponse
-                {
-                    FieldErrors = validator.Errors.ToDictionary(x => x.PropertyName, x => x.ErrorMessage)
-                }); 
-            }
+            await ValidateModelAsync(createExpenseInputModel.ToValidationModel(), cancellationToken);
             var budget = await _budgetService.GetByID(createExpenseInputModel.BudgetID, cancellationToken);
             
             if(budget == null)
@@ -61,15 +53,7 @@ namespace EWallet.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateExpenseInputModel updateExpenseInputModel, CancellationToken cancellationToken)
         {
-            var validator = await _validator.ValidateAsync(updateExpenseInputModel.ToValidationModel(), cancellationToken);
-
-            if (!validator.IsValid)
-            {
-                return BadRequest(new ErrorResponse
-                {
-                    FieldErrors = validator.Errors.ToDictionary(x => x.PropertyName, x => x.ErrorMessage)
-                });
-            }
+            await ValidateModelAsync(updateExpenseInputModel.ToValidationModel(), cancellationToken);
             var expense = await _expenseService.GetByID(id,"Budget", cancellationToken);
 
             if(expense == null)
@@ -135,5 +119,16 @@ namespace EWallet.Controllers
 
             return NoContent();
         }
+
+        private async Task ValidateModelAsync(ExpenseValidationModel model, CancellationToken cancellationToken)
+        {
+            var validationResult = await _validator.ValidateAsync(model, cancellationToken);
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
+
+        }
+
     }
 }

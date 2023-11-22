@@ -1,4 +1,5 @@
 ﻿using EWallet.Models;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 
 namespace EWallet.Middleware
@@ -18,12 +19,29 @@ namespace EWallet.Middleware
             {
                 await _next(context);
             }
+            catch(FluentValidation.ValidationException ex)
+            {
+                await HandleValidationException(context, ex);
+            }
             catch (Exception ex)
             {
                 await HandleExceptionAsync(context, ex);
             }
         }
-        private Task HandleExceptionAsync(HttpContext context, Exception exception)
+
+        private static Task HandleValidationException(HttpContext context, FluentValidation.ValidationException ex)
+        {
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = (int) HttpStatusCode.BadRequest;
+
+            return context.Response.WriteAsJsonAsync(new ErrorResponse
+            {
+                FieldErrors = ex.Errors.ToDictionary(validationFailure => validationFailure.PropertyName,
+                                                                                                        validationFailure => validationFailure.ErrorMessage)
+            }); ;
+        }
+
+        private static Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;

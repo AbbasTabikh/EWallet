@@ -1,4 +1,5 @@
 ﻿using EWallet.Dtos;
+using EWallet.Entities;
 using EWallet.InputModels;
 using EWallet.Mappings;
 using EWallet.Models;
@@ -27,15 +28,7 @@ namespace EWallet.Controllers
         [HttpPost]
         public async Task<ActionResult<BudgetDto>> Create([FromBody] CreateBudgetInputModel createBudgetInputModel, CancellationToken cancellationToken)
         {
-            var validator = await _validator.ValidateAsync(createBudgetInputModel.ToValidationModel());
-            if (!validator.IsValid)
-            {
-                return BadRequest(new ErrorResponse
-                {
-                    FieldErrors = validator.Errors.ToDictionary(validationFailure => validationFailure.PropertyName,
-                                                                                                        validationFailure => validationFailure.ErrorMessage)
-                });
-            }
+            await ValidateModelAsync(createBudgetInputModel.ToValidationModel(), cancellationToken);
             var budgetDto = await _budgetService.Create(createBudgetInputModel, cancellationToken);
             await _budgetService.Save(cancellationToken);
             return Ok(budgetDto);
@@ -66,15 +59,7 @@ namespace EWallet.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] Guid id,[FromBody] UpdateBudgetInputModel updateBudgetInputModel, CancellationToken cancellationToken)
         {
-            var validator = await _validator.ValidateAsync(updateBudgetInputModel.ToValidationModel(), cancellationToken);
-            if (!validator.IsValid)
-            {
-                return BadRequest(new ErrorResponse
-                {
-                    ErrorMessage = validator.Errors.Select(x => x.ErrorMessage).First()
-                });
-            }
-
+            await ValidateModelAsync(updateBudgetInputModel.ToValidationModel(), cancellationToken);
             var budget = await _budgetService.GetByID(id, cancellationToken);
 
             if (budget == null)
@@ -112,6 +97,16 @@ namespace EWallet.Controllers
             _budgetService.BulkDelete(existingBudgets);
             await _budgetService.Save(cancellationToken);
             return NoContent();
+        }
+
+        private async Task ValidateModelAsync(BudgetValidationModel model, CancellationToken cancellationToken)
+        {
+            var validationResult = await _validator.ValidateAsync(model, cancellationToken);
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
+
         }
     }
 }

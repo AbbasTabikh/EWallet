@@ -47,14 +47,14 @@ namespace EWallet.Controllers
         [HttpPost("signin")]
         public async Task<ActionResult<AccessToken>> SignIn([FromBody] UserInput userInput, CancellationToken cancellation)
         {
-            var userLoginStatus = await _userService.SignIn(userInput, cancellation);
+            var (user, status) = await _userService.SignIn(userInput, cancellation);
 
             var errorResponse = new ErrorResponse
             {
                 FieldErrors = new Dictionary<string, string>()
             };
 
-            switch (userLoginStatus.status)
+            switch (status)
             {
                 case LoginStatus.UserNotFound:
                     errorResponse.FieldErrors.Add("Username", "Username doesn't exist");
@@ -69,7 +69,7 @@ namespace EWallet.Controllers
                 return NotFound(errorResponse);
             }
 
-            return Ok(_tokenService.GenerateToken(userLoginStatus.user!));
+            return Ok(_tokenService.GenerateToken(user!));
         }
 
 

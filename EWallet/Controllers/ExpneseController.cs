@@ -31,7 +31,7 @@ namespace EWallet.Controllers
         [HttpPost]
         public async Task<ActionResult<ExpenseDto>> Create([FromBody] CreateExpenseInputModel createExpenseInputModel, CancellationToken cancellationToken)
         {
-            await ValidateModelAsync(createExpenseInputModel.ToValidationModel(), cancellationToken);
+            await _validator.ValidateAndThrowAsync(createExpenseInputModel.ToValidationModel(), cancellationToken);
             var budget = await _budgetService.GetByID(createExpenseInputModel.BudgetID, cancellationToken);
             
             if(budget == null)
@@ -53,7 +53,7 @@ namespace EWallet.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateExpenseInputModel updateExpenseInputModel, CancellationToken cancellationToken)
         {
-            await ValidateModelAsync(updateExpenseInputModel.ToValidationModel(), cancellationToken);
+            await _validator.ValidateAndThrowAsync(updateExpenseInputModel.ToValidationModel(), cancellationToken);
             var expense = await _expenseService.GetByID(id,"Budget", cancellationToken);
 
             if(expense == null)
@@ -89,7 +89,6 @@ namespace EWallet.Controllers
                     ErrorMessage = $"expense with ID {id} doesn't exist in the database"
                 });
             }
-
             _expenseService.Delete(expense);
             _budgetService.UpdateBudgetTotal(expense.Budget, expense.Price, 0);
             await _expenseService.Save(cancellationToken);
@@ -118,16 +117,6 @@ namespace EWallet.Controllers
             }
 
             return NoContent();
-        }
-
-        private async Task ValidateModelAsync(ExpenseValidationModel model, CancellationToken cancellationToken)
-        {
-            var validationResult = await _validator.ValidateAsync(model, cancellationToken);
-            if (!validationResult.IsValid)
-            {
-                throw new ValidationException(validationResult.Errors);
-            }
-
         }
 
     }

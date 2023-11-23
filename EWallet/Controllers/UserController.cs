@@ -26,19 +26,7 @@ namespace EWallet.Controllers
         [HttpPost("signup")]
         public async Task<ActionResult<AccessToken>> SignUp([FromBody] UserInput userInput, CancellationToken cancellationToken)
         {
-            var result = await _userValidator.ValidateAsync(userInput, cancellationToken);
-
-            if (!result.IsValid)
-            {
-                var errors = result.Errors.ToDictionary(validationFailure => validationFailure.PropertyName,
-                                                                                                validationFailure => validationFailure.ErrorMessage);
-
-                return BadRequest(new ErrorResponse
-                {
-                    FieldErrors = errors
-                });
-            }
-
+            await _userValidator.ValidateAndThrowAsync(userInput, cancellationToken);
             var user = await _userService.SignUp(userInput, cancellationToken);
             await _userService.Save(cancellationToken);
             return Ok(_tokenService.GenerateToken(user));

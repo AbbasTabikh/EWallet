@@ -28,7 +28,7 @@ namespace EWallet.Controllers
         [HttpPost]
         public async Task<ActionResult<BudgetDto>> Create([FromBody] CreateBudgetInputModel createBudgetInputModel, CancellationToken cancellationToken)
         {
-            await ValidateModelAsync(createBudgetInputModel.ToValidationModel(), cancellationToken);
+            await _validator.ValidateAndThrowAsync(createBudgetInputModel.ToValidationModel(), cancellationToken);
             var budgetDto = await _budgetService.Create(createBudgetInputModel, cancellationToken);
             await _budgetService.Save(cancellationToken);
             return Ok(budgetDto);
@@ -59,7 +59,7 @@ namespace EWallet.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] Guid id,[FromBody] UpdateBudgetInputModel updateBudgetInputModel, CancellationToken cancellationToken)
         {
-            await ValidateModelAsync(updateBudgetInputModel.ToValidationModel(), cancellationToken);
+            await _validator.ValidateAndThrowAsync(updateBudgetInputModel.ToValidationModel(), cancellationToken);
             var budget = await _budgetService.GetByID(id, cancellationToken);
 
             if (budget == null)
@@ -99,14 +99,5 @@ namespace EWallet.Controllers
             return NoContent();
         }
 
-        private async Task ValidateModelAsync(BudgetValidationModel model, CancellationToken cancellationToken)
-        {
-            var validationResult = await _validator.ValidateAsync(model, cancellationToken);
-            if (!validationResult.IsValid)
-            {
-                throw new ValidationException(validationResult.Errors);
-            }
-
-        }
     }
 }

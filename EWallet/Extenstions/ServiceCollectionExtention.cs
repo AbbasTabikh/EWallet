@@ -3,6 +3,7 @@ using EWallet.InputModels;
 using EWallet.Repository;
 using EWallet.Services;
 using EWallet.Services.Interfaces;
+using EWallet.Settings;
 using EWallet.Validations;
 using EWallet.Validations.ValidationModels;
 using FluentValidation;
@@ -23,13 +24,9 @@ namespace EWallet.Extenstions
                                                provider => provider.EnableRetryOnFailure(8, TimeSpan.FromSeconds(25), null)));
             return services;
         }
-
         internal static IServiceCollection AddJwt(this IServiceCollection services, IConfiguration configuration)
         {
-            string issuer = configuration.GetSection("Jwt:Issuer").Get<string>()!;
-            string audience = configuration.GetSection("Jwt:Audience").Get<string>()!;
-            string secret = configuration.GetSection("Jwt:Secret").Get<string>()!;
-
+            var jwtOptions = configuration.GetSection("Jwt").Get<JwtConfiguration>()!;
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
@@ -38,16 +35,15 @@ namespace EWallet.Extenstions
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = issuer,
-                    ValidAudience = audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)),
+                    ValidIssuer = jwtOptions.Issuer,
+                    ValidAudience = jwtOptions.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Secret)),
                     ClockSkew = TimeSpan.Zero
                 };
             });
 
             return services;
         }
-
         internal static IServiceCollection AddValidators(this IServiceCollection services)
         {
             services.AddScoped<IValidator<UserInput>, UserValidation>();
@@ -88,7 +84,6 @@ namespace EWallet.Extenstions
 
             return services;
         }
-
         internal static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddHttpContextAccessor();

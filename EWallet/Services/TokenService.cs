@@ -1,6 +1,7 @@
 ﻿using EWallet.Entities;
 using EWallet.Models;
 using EWallet.Services.Interfaces;
+using EWallet.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -21,14 +22,9 @@ namespace EWallet.Services
 
         public AccessToken GenerateToken(User user)
         {
-            //get the configurations
-            double days = _configuration.GetSection("Jwt:AccessTokenExpiration").Get<double>();
-            string issuer = _configuration.GetSection("Jwt:Issuer").Get<string>()!;
-            string audience = _configuration.GetSection("Jwt:Audience").Get<string>()!;
-            string secret = _configuration.GetSection("Jwt:Secret").Get<string>()!;
-
-            var accessTokenExpiration = DateTime.UtcNow.AddDays(days);
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
+            var jwtOptions = _configuration.GetSection("Jwt").Get<JwtConfiguration>()!;
+            var accessTokenExpiration = DateTime.UtcNow.AddDays(jwtOptions.AccessTokenExpiration);
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Secret));
 
             var userClaims = new List<Claim>
             {
@@ -38,8 +34,8 @@ namespace EWallet.Services
 
             var securityToken = new JwtSecurityToken
             (
-                issuer: issuer,
-                audience: audience,
+                issuer: jwtOptions.Issuer,
+                audience: jwtOptions.Audience,
                 claims: userClaims,
                 expires: accessTokenExpiration,
                 notBefore: DateTime.UtcNow,

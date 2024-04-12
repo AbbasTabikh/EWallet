@@ -1,6 +1,6 @@
 ﻿namespace EWallet.InputModels
 {
-    public class UpdateBudgetInputModel
+    public record UpdateBudgetInputModel
     {
         public decimal Total { get; set; }
     }

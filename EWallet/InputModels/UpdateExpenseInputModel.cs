@@ -1,6 +1,6 @@
 ﻿namespace EWallet.InputModels
 {
-    public class UpdateExpenseInputModel
+    public record UpdateExpenseInputModel
     {
         public string? Name { get; set; }
         public decimal? NewPrice { get; set; }

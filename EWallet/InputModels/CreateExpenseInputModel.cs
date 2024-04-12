@@ -2,7 +2,7 @@
 
 namespace EWallet.InputModels
 {
-    public class CreateExpenseInputModel
+    public record CreateExpenseInputModel
     {
         public string Category { get; set; } = string.Empty;
         public string Name { get; set; }

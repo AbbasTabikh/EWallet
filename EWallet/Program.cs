@@ -1,8 +1,5 @@
 using EWallet.Extenstions;
 using EWallet.Middleware;
-using EWallet.Settings;
-using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,5 +27,5 @@ app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
-
+app.ApplyMigration();
 app.Run();
